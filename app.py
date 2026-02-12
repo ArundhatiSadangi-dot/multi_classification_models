@@ -15,7 +15,7 @@ from sklearn.metrics import (
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-st.set_page_config(page_title="Wine Quality (White) — Multiclass Classifiers", layout="wide")
+st.set_page_config(page_title="Breast Cancer Diagnosis — Classifiers", layout="wide")
 
 MODELS_DIR = Path("models")
 MODEL_FILES = {
@@ -23,12 +23,12 @@ MODEL_FILES = {
     "Decision Tree": "decision_tree.joblib",
     "KNN": "knn.joblib",
     "Naive Bayes": "naive_bayes.joblib",
-    "Random Forest (Ensemble)": "random_forest.joblib",
-    "XGBoost (Ensemble)": "xgboost.joblib",
+    "Random Forest (Ensemble)": "random_forest_ensemble.joblib",
+    "XGBoost (Ensemble)": "xgboost_ensemble.joblib",
 }
 
-st.title("🍷 Wine Quality (White) — Multiclass Classification")
-st.caption("Upload test CSV (same schema as training), choose a model, and view metrics + confusion matrix.")
+st.title("🔬 Breast Cancer (Diagnostic) — Classification")
+st.caption("Upload test CSV (same schema as training, with 'target' column), choose a model, and view metrics + confusion matrix.")
 
 # Sidebar
 st.sidebar.header("Model Selection")
@@ -61,19 +61,19 @@ def plot_cm(y_true, y_pred, title="Confusion Matrix"):
     st.pyplot(fig)
 
 st.header("1) Upload Test CSV")
-uploaded = st.file_uploader("Upload a CSV with the same columns used in training (features + 'quality' as target).", type=["csv"])
+uploaded = st.file_uploader("Upload a CSV with the same columns used in training (features + 'target' as label).", type=["csv"])
 
 if uploaded:
     df = pd.read_csv(uploaded, sep=None, engine="python")  # auto-detect delimiter
     st.write("Preview:", df.head())
 
     # Basic schema checks
-    if "quality" not in df.columns:
-        st.error("CSV must contain the target column 'quality'.")
+    if "target" not in df.columns:
+        st.error("CSV must contain the target column 'target'.")
         st.stop()
 
-    X = df.drop(columns=["quality"])
-    y = df["quality"].astype(int)
+    X = df.drop(columns=["target"])
+    y = df["target"].astype(int)
     classes_sorted = sorted(y.unique())
 
     model_path = MODELS_DIR / MODEL_FILES[model_name]
